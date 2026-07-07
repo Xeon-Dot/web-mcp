@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Xeon MCP — Model Context Protocol, Supercharged</title>
+  <meta name="description" content="Xeon MCP: 고성능 MCP(Model Context Protocol) 게이트웨이로 AI 에이전트에 강력한 컨텍스트와 도구를 연결하세요." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+/* ===== Reset & Base ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #070a0f;
+  color: #e2e8f0;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0f141c; }
+::-webkit-scrollbar-thumb { background: #2d3748; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #4a5568; }
+
+/* ===== Utility ===== */
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+.section-label {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 0.8rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase;
+  color: #818cf8; margin-bottom: 16px;
+}
+.section-label::before {
+  content: ''; display: inline-block; width: 24px; height: 1.5px;
+  background: linear-gradient(90deg, #6366f1, transparent); border-radius: 1px;
+}
+h2 { font-size: clamp(1.8rem, 4.5vw, 3rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; }
+h2 span { background: linear-gradient(135deg, #a5b4fc, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+p.subtitle { font-size: 1.05rem; color: #94a3b8; max-width: 600px; margin-top: 12px; }
+
+/* ===== Ambient Background ===== */
+#bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+
+/* ===== Navbar ===== */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 16px 0; transition: background 0.3s, backdrop-filter 0.3s;
+}
+nav.scrolled { background: rgba(7,10,15,0.75); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(99,102,241,0.08); }
+nav .container { display: flex; align-items: center; justify-content: space-between; }
+.logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.25rem; }
+.logo-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; font-weight: 900; color: #fff; box-shadow: 0 0 20px rgba(99,102,241,0.3);
+}
+.nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+.nav-links a { font-size: 0.875rem; font-weight: 500; color: #94a3b8; transition: color 0.2s; }
+.nav-links a:hover { color: #e2e8f0; }
+.btn-nav { padding: 8px 20px; border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; }
+.btn-nav-primary { background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff; }
+.btn-nav-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(99,102,241,0.35); }
+.btn-nav-ghost { background: transparent; color: #e2e8f0; border: 1px solid rgba(99,102,241,0.2); }
+.btn-nav-ghost:hover { border-color: #6366f1; background: rgba(99,102,241,0.08); }
+.mobile-toggle { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; }
+.mobile-toggle span { display: block; width: 24px; height: 2px; background: #e2e8f0; border-radius: 2px; transition: 0.3s; }
+
+/* ===== Hero ===== */
+.hero {
+  position: relative; z-index: 1; min-height: 100vh;
+  display: flex; align-items: center; padding: 120px 0 80px;
+}
+.hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+.hero h1 {
+  font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 900; letter-spacing: -0.04em;
+  line-height: 1.08;
+}
+.hero h1 .gradient {
+  background: linear-gradient(135deg, #c7d2fe 0%, #818cf8 30%, #6366f1 60%, #4f46e5 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-desc { font-size: 1.1rem; color: #94a3b8; margin-top: 20px; max-width: 520px; line-height: 1.7; }
+.hero-badges { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 32px; }
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 100px; font-size: 0.78rem; font-weight: 500;
+  background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.15); color: #a5b4fc;
+}
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 40px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px;
+  border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer;
+  transition: all 0.25s; border: none;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff;
+  box-shadow: 0 2px 12px rgba(99,102,241,0.25);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(99,102,241,0.4); }
+.btn-secondary {
+  background: rgba(255,255,255,0.04); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.08);
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); }
+
+/* Hero right — 3D card stack */
+.hero-visual { position: relative; }
+.card-stack { position: relative; width: 100%; aspect-ratio: 4/3; perspective: 1000px; }
+.floating-card {
+  position: absolute; width: 75%; padding: 24px; border-radius: 16px;
+  background: rgba(15,20,28,0.8); backdrop-filter: blur(12px);
+  border: 1px solid rgba(99,102,241,0.12); box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  transition: transform 0.3s;
+}
+.floating-card .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.floating-card .card-dot { width: 10px; height: 10px; border-radius: 50%; }
+.floating-card .card-title { font-size: 0.78rem; font-weight: 600; color: #94a3b8; letter-spacing: 0.05em; text-transform: uppercase; }
+.floating-card .card-line { height: 8px; border-radius: 4px; margin-top: 8px; }
+.floating-card .card-line:nth-child(2) { width: 80%; }
+.floating-card .card-line:nth-child(3) { width: 55%; }
+.fc-1 { top: 0; right: 0; transform: rotateY(-6deg) rotateX(4deg); }
+.fc-1 .card-dot { background: #6366f1; }
+.fc-1 .card-line { background: linear-gradient(90deg, rgba(99,102,241,0.3), transparent); }
+.fc-2 { bottom: 8%; left: 0; transform: rotateY(4deg) rotateX(-2deg); z-index: 2; }
+.fc-2 .card-dot { background: #22d3ee; }
+.fc-2 .card-line { background: linear-gradient(90deg, rgba(34,211,238,0.3), transparent); }
+.fc-3 { bottom: 0; right: 5%; transform: rotateY(-2deg) rotateX(6deg); z-index: 1; width: 65%; }
+.fc-3 .card-dot { background: #a78bfa; }
+.fc-3 .card-line { background: linear-gradient(90deg, rgba(167,139,250,0.3), transparent); }
+
+.hero-stats {
+  display: flex; gap: 32px; margin-top: 48px; padding-top: 32px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+.stat-value { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+.stat-label { font-size: 0.82rem; color: #64748b; margin-top: 2px; }
+
+/* ===== Section ===== */
+section { position: relative; z-index: 1; padding: 100px 0; }
+.section-header { text-align: center; margin-bottom: 60px; }
+.section-header p.subtitle { margin: 12px auto 0; }
+
+/* ===== Features ===== */
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.feature-card {
+  padding: 32px; border-radius: 16px;
+  background: linear-gradient(145deg, rgba(15,20,28,0.6), rgba(15,20,28,0.3));
+  border: 1px solid rgba(99,102,241,0.06); transition: all 0.3s;
+}
+.feature-card:hover { border-color: rgba(99,102,241,0.15); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+.feature-icon {
+  width: 48px; height: 48px; border-radius: 12px; margin-bottom: 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.25rem;
+}
+.feature-icon.v1 { background: rgba(99,102,241,0.1); color: #818cf8; }
+.feature-icon.v2 { background: rgba(34,211,238,0.1); color: #22d3ee; }
+.feature-icon.v3 { background: rgba(167,139,250,0.1); color: #a78bfa; }
+.feature-icon.v4 { background: rgba(52,211,153,0.1); color: #34d399; }
+.feature-icon.v5 { background: rgba(251,191,36,0.1); color: #fbbf24; }
+.feature-icon.v6 { background: rgba(244,114,182,0.1); color: #f472b6; }
+.feature-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+.feature-card p { font-size: 0.9rem; color: #94a3b8; line-height: 1.65; }
+
+/* ===== Protocol Section ===== */
+.protocol-showcase {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;
+}
+.protocol-text .accent-text { color: #818cf8; font-weight: 600; font-size: 0.9rem; margin-bottom: 8px; }
+.protocol-text ul { list-style: none; margin-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+.protocol-text ul li {
+  padding-left: 24px; position: relative; font-size: 0.95rem; color: #cbd5e1;
+}
+.protocol-text ul li::before {
+  content: ''; position: absolute; left: 0; top: 8px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #6366f1; box-shadow: 0 0 10px rgba(99,102,241,0.4);
+}
+.code-block {
+  background: #0a0f18; border: 1px solid rgba(99,102,241,0.08); border-radius: 14px;
+  padding: 24px; overflow-x: auto;
+}
+.code-block .code-header {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.code-block .code-dot { width: 10px; height: 10px; border-radius: 50%; background: #ef4444; }
+.code-block .code-dot:nth-child(2) { background: #fbbf24; }
+.code-block .code-dot:nth-child(3) { background: #34d399; }
+.code-block .code-lang { margin-left: auto; font-size: 0.7rem; color: #4a5568; letter-spacing: 0.05em; text-transform: uppercase; }
+.code-block pre { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; line-height: 1.7; color: #a5b4fc; }
+.code-block .kw { color: #818cf8; }
+.code-block .str { color: #34d399; }
+.code-block .cm { color: #4a5568; font-style: italic; }
+.code-block .fn { color: #fbbf24; }
+.code-block .num { color: #f472b6; }
+.code-block .prop { color: #22d3ee; }
+
+/* ===== MCP Servers ===== */
+.servers-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.server-card {
+  padding: 24px; border-radius: 14px; text-align: center;
+  background: linear-gradient(145deg, rgba(15,20,28,0.5), rgba(15,20,28,0.2));
+  border: 1px solid rgba(99,102,241,0.06); transition: all 0.3s;
+}
+.server-card:hover { border-color: rgba(99,102,241,0.12); transform: translateY(-3px); }
+.server-icon {
+  width: 44px; height: 44px; border-radius: 12px; margin: 0 auto 16px;
+  display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+}
+.server-card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
+.server-card p { font-size: 0.78rem; color: #64748b; }
+
+/* ===== How It Works ===== */
+.steps { display: flex; flex-direction: column; gap: 32px; max-width: 800px; margin: 0 auto; }
+.step {
+  display: flex; gap: 24px; align-items: flex-start;
+  padding: 24px 28px; border-radius: 14px;
+  background: rgba(15,20,28,0.4); border: 1px solid rgba(99,102,241,0.04);
+  transition: border-color 0.3s;
+}
+.step:hover { border-color: rgba(99,102,241,0.1); }
+.step-num {
+  flex-shrink: 0; width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 0.9rem;
+  background: rgba(99,102,241,0.1); color: #818cf8; border: 1px solid rgba(99,102,241,0.12);
+}
+.step-content h3 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+.step-content p { font-size: 0.88rem; color: #94a3b8; }
+
+/* ===== CTA ===== */
+.cta-section {
+  text-align: center; padding: 80px 24px;
+  background: radial-gradient(ellipse at center, rgba(99,102,241,0.06) 0%, transparent 70%);
+  border-radius: 24px; border: 1px solid rgba(99,102,241,0.06);
+}
+.cta-section h2 { font-size: clamp(1.8rem, 4vw, 2.8rem); }
+.cta-section p { font-size: 1.05rem; color: #94a3b8; max-width: 500px; margin: 16px auto 32px; }
+.cta-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+/* ===== Footer ===== */
+footer { position: relative; z-index: 1; border-top: 1px solid rgba(255,255,255,0.04); padding: 48px 0; }
+.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; }
+.footer-brand p { font-size: 0.85rem; color: #64748b; margin-top: 12px; max-width: 300px; }
+.footer-col h4 { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; margin-bottom: 16px; }
+.footer-col ul { list-style: none; }
+.footer-col li { margin-bottom: 10px; }
+.footer-col a { font-size: 0.88rem; color: #64748b; transition: color 0.2s; }
+.footer-col a:hover { color: #e2e8f0; }
+.footer-bottom { margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.04); display: flex; justify-content: space-between; align-items: center; }
+.footer-bottom p { font-size: 0.8rem; color: #475569; }
+
+/* ===== Responsive ===== */
+@media (max-width: 968px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 48px; }
+  .hero-visual { display: none; }
+  .features-grid { grid-template-columns: 1fr 1fr; }
+  .protocol-showcase { grid-template-columns: 1fr; }
+  .servers-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; background: rgba(7,10,15,0.95); backdrop-filter: blur(20px); flex-direction: column; padding: 24px; gap: 20px; border-bottom: 1px solid rgba(99,102,241,0.08); }
+  .nav-links.open { display: flex; }
+  .mobile-toggle { display: flex; }
+  .features-grid { grid-template-columns: 1fr; }
+  .servers-grid { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .hero-stats { flex-wrap: wrap; gap: 20px; }
+  section { padding: 60px 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Canvas Background ===== -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- ===== Navbar ===== -->
+<nav>
+  <div class="container">
+    <a href="#" class="logo">
+      <span class="logo-icon">X</span>
+      Xeon MCP
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#protocol">Protocol</a></li>
+      <li><a href="#servers">Servers</a></li>
+      <li><a href="#how-it-works">How It Works</a></li>
+      <li><button class="btn-nav btn-nav-ghost">Sign In</button></li>
+      <li><button class="btn-nav btn-nav-primary">Get Started</button></li>
+    </ul>
+    <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ===== Hero ===== -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-badges">
+          <span class="badge">⚡ MCP Protocol</span>
+          <span class="badge">🔌 Plug & Play</span>
+          <span class="badge">🚀 Enterprise Grade</span>
+        </div>
+        <h1>
+          <span class="gradient">Model Context<br/>Protocol,</span><br/>
+          Supercharged.
+        </h1>
+        <p class="hero-desc">
+          Xeon MCP는 AI 에이전트에 컨텍스트, 도구, 데이터 소스를 연결하는
+          고성능 MCP 게이트웨이입니다. 표준 프로토콜 위에 안정성, 속도,
+          관측 가능성을 더했습니다.
+        </p>
+        <div class="hero-actions">
+          <button class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            시작하기
+          </button>
+          <button class="btn btn-secondary">문서 보기</button>
+        </div>
+        <div class="hero-stats">
+          <div><div class="stat-value">30+</div><div class="stat-label">MCP Servers</div></div>
+          <div><div class="stat-value">99.9%</div><div class="stat-label">Uptime</div></div>
+          <div><div class="stat-value">&lt;5ms</div><div class="stat-label">Avg Latency</div></div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="card-stack">
+          <div class="floating-card fc-1">
+            <div class="card-header">
+              <span class="card-dot"></span>
+              <span class="card-title">Context Hub</span>
+            </div>
+            <div class="card-line"></div>
+            <div class="card-line"></div>
+            <div class="card-line" style="width:40%"></div>
+          </div>
+          <div class="floating-card fc-2">
+            <div class="card-header">
+              <span class="card-dot"></span>
+              <span class="card-title">Tool Registry</span>
+            </div>
+            <div class="card-line"></div>
+            <div class="card-line"></div>
+            <div class="card-line" style="width:65%"></div>
+          </div>
+          <div class="floating-card fc-3">
+            <div class="card-header">
+              <span class="card-dot"></span>
+              <span class="card-title">Resource Bridge</span>
+            </div>
+            <div class="card-line"></div>
+            <div class="card-line" style="width:50%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Features ===== -->
+<section id="features">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Features</div>
+      <h2>Why <span>Xeon MCP</span>?</h2>
+      <p class="subtitle">MCP의 모든 장점 위에, 운영에 필요한 모든 것을 추가했습니다.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon v1">⚡</div>
+        <h3>초저지연 게이트웨이</h3>
+        <p>전 세계 엣지 네트워크를 통해 MCP 요청을 라우팅합니다. 평균 5ms 이하의 지연 시간으로 AI 에이전트가 실시간으로 반응합니다.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon v2">🔌</div>
+        <h3>30+ 내장 MCP 서버</h3>
+        <p>파일 시스템, 데이터베이스, API, 검색, 브라우저 등 즉시 사용 가능한 MCP 서버를 제공합니다. 커스텀 서버도 간편하게 등록하세요.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon v3">🛡️</div>
+        <h3>보안 &amp; 인증</h3>
+        <p>API 키 기반 인증, OAuth 2.0, RBAC(역할 기반 접근 제어)를 지원합니다. 모든 MCP 요청은 암호화된 채널로 전송됩니다.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon v4">📊</div>
+        <h3>관측 가능성</h3>
+        <p>실시간 메트릭, 분산 트레이싱, 구조화된 로깅을 기본 제공합니다. OpenTelemetry와 완전히 호환되어 기존 모니터링 스택과 연결하세요.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon v5">🔄</div>
+        <h3>자동 장애 조치</h3>
+        <p>다중 리전 배포, 자동 재시도, 서킷 브레이커 패턴으로 MCP 서버 장애에 영향을 받지 않습니다. SLA 99.9%를 보장합니다.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon v6">🧩</div>
+        <h3>커스텀 서버 SDK</h3>
+        <p>TypeScript, Python, Go SDK로 몇 분 만에 나만의 MCP 서버를 구축하고 Xeon에 등록하세요. 코드 생성과 템플릿을 제공합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Protocol Section ===== -->
+<section id="protocol">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Protocol</div>
+      <h2>Built on <span>MCP Standard</span></h2>
+      <p class="subtitle">Model Context Protocol의 모든 기능을 그대로 지원하면서 확장합니다.</p>
+    </div>
+    <div class="protocol-showcase">
+      <div class="protocol-text">
+        <div class="accent-text">✅ Full MCP Compatibility</div>
+        <p style="color:#94a3b8;font-size:0.95rem;">
+          Xeon MCP는 Anthropic이 정의한 Model Context Protocol을 완전히 구현합니다.
+          모든 MCP 클라이언트와 호환되며, 추가 확장 기능을 제공합니다.
+        </p>
+        <ul>
+          <li><strong>Resources</strong> — 파일, API, 데이터베이스 등 외부 데이터를 컨텍스트로 제공</li>
+          <li><strong>Tools</strong> — AI 에이전트가 실행할 수 있는 함수와 API 정의</li>
+          <li><strong>Prompts</strong> — 재사용 가능한 프롬프트 템플릿 관리</li>
+          <li><strong>Sampling</strong> — 서버가 클라이언트에 추가 LLM 생성을 요청</li>
+          <li><strong>Transports</strong> — stdio, SSE, WebSocket 전송 방식 지원</li>
+        </ul>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span>
+          <span class="code-lang">JSON-RPC</span>
+        </div>
+        <pre>{
+  <span class="prop">"jsonrpc"</span>: <span class="str">"2.0"</span>,
+  <span class="prop">"method"</span>: <span class="str">"tools/call"</span>,
+  <span class="prop">"params"</span>: {
+    <span class="prop">"name"</span>: <span class="str">"fetch_webpage"</span>,
+    <span class="prop">"arguments"</span>: {
+      <span class="prop">"url"</span>: <span class="str">"https://xeon-mcp.dev"</span>
+    }
+  },
+  <span class="prop">"id"</span>: <span class="num">1</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MCP Servers ===== -->
+<section id="servers">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Ecosystem</div>
+      <h2>Available <span>MCP Servers</span></h2>
+      <p class="subtitle">즉시 연결할 수 있는 내장 MCP 서버들입니다.</p>
+    </div>
+    <div class="servers-grid">
+      <div class="server-card">
+        <div class="server-icon" style="background:rgba(99,102,241,0.1);color:#818cf8">📁</div>
+        <h3>Filesystem</h3>
+        <p>로컬 및 원격 파일 시스템 접근</p>
+      </div>
+      <div class="server-card">
+        <div class="server-icon" style="background:rgba(34,211,238,0.1);color:#22d3ee">🗄️</div>
+        <h3>Database</h3>
+        <p>PostgreSQL, MySQL, SQLite</p>
+      </div>
+      <div class="server-card">
+        <div class="server-icon" style="background:rgba(167,139,250,0.1);color:#a78bfa">🌐</div>
+        <h3>Web Fetch</h3>
+        <p>웹 페이지 및 API 요청</p>
+      </div>
+      <div class="server-card">
+        <div class="server-icon" style="background:rgba(52,211,153,0.1);color:#34d399">🔍</div>
+        <h3>Search</h3>
+        <p>벡터 검색 및全文 검색</p>
+      </div>
+      <div class="server-card">
+        <div class="server-icon" style="background:rgba(251,191,36,0.1);color:#fbbf24">📧</div>
+        <h3>Email</h3>
+        <p>IMAP/SMTP 메일 연동</p>
+      </div>
+      <div class="server-card">
+        <div class="server-icon" style="background:rgba(244,114,182,0.1);color:#f472b6">☁️</div>
+        <h3>Cloud Storage</h3>
+        <p>S3, GCS, R2 연동</p>
+      </div>
+      <div class="server-card">
+        <div class="server-icon" style="background:rgba(99,102,241,0.1);color:#818cf8">🐙</div>
+        <h3>GitHub</h3>
+        <p>레포지토리, 이슈, PR 관리</p>
+      </div>
+      <div class="server-card">
+        <div class="server-icon" style="background:rgba(34,211,238,0.1);color:#22d3ee">🧪</div>
+        <h3>Custom SDK</h3>
+        <p>TypeScript · Python · Go</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== How It Works ===== -->
+<section id="how-it-works">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">How It Works</div>
+      <h2>Connect in <span>3 Steps</span></h2>
+      <p class="subtitle">Xeon MCP를 시작하는 방법은 간단합니다.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>계정 생성 및 프로젝트 설정</h3>
+          <p>Xeon MCP에 가입하고 프로젝트를 생성하면 고유한 API 엔드포인트와 API 키가 발급됩니다. 5분이면 완료됩니다.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>MCP 서버 연결 또는 생성</h3>
+          <p>내장된 30여 개의 MCP 서버 중에서 선택하거나, SDK를 사용해 커스텀 MCP 서버를 작성하고 등록하세요. 모든 서버는 자동으로 검색 가능합니다.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>AI 에이전트와 연결</h3>
+          <p>Claude Desktop, Cursor, VS Code 등 MCP를 지원하는 모든 클라이언트에서 Xeon 게이트웨이를 통해 서버에 접근하세요. 설정은 단 한 줄이면 됩니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section>
+  <div class="container">
+    <div class="cta-section">
+      <h2>Ready to <span>Supercharge</span><br/>Your AI Agents?</h2>
+      <p>지금 Xeon MCP에 가입하고 AI 에이전트에 강력한 컨텍스트와 도구를 연결하세요.</p>
+      <div class="cta-actions">
+        <button class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          무료로 시작하기
+        </button>
+        <button class="btn btn-secondary">데모 요청</button>
+        <button class="btn btn-secondary">GitHub</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Footer ===== -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#" class="logo">
+          <span class="logo-icon">X</span>Xeon MCP
+        </a>
+        <p>Model Context Protocol을 위한 고성능 게이트웨이. AI 에이전트에 컨텍스트, 도구, 데이터 소스를 연결하세요.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#">Features</a></li>
+          <li><a href="#">Pricing</a></li>
+          <li><a href="#">Documentation</a></li>
+          <li><a href="#">Changelog</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="#">MCP Specification</a></li>
+          <li><a href="#">SDK &amp; Tools</a></li>
+          <li><a href="#">Server Marketplace</a></li>
+          <li><a href="#">Blog</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Status</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Xeon MCP. All rights reserved.</p>
+      <p>Built on the Model Context Protocol</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ===== JavaScript ===== -->
+<script>
+// ---- Ambient Particle Background ----
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.vx = (Math.random() - 0.5) * 0.5;
+    this.vy = (Math.random() - 0.5) * 0.5;
+    this.r = Math.random() * 2 + 0.5;
+    this.alpha = Math.random() * 0.4 + 0.1;
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy;
+    if (this.x < 0 || this.x > W) this.vx *= -1;
+    if (this.y < 0 || this.y > H) this.vy *= -1;
+  }
+  draw() {
+    ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(99,102,241,${this.alpha})`; ctx.fill();
+  }
+}
+
+function initParticles() {
+  const count = Math.min(80, Math.floor(W * H / 15000));
+  particles = Array.from({ length: count }, () => new Particle());
+}
+
+function drawLines() {
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 120) {
+        ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(99,102,241,${0.06 * (1 - dist / 120)})`;
+        ctx.lineWidth = 0.5; ctx.stroke();
+      }
+    }
+  }
+}
+
+function animate() {
+  ctx.clearRect(0, 0, W, H);
+  particles.forEach(p => { p.update(); p.draw(); });
+  drawLines();
+  requestAnimationFrame(animate);
+}
+
+window.addEventListener('resize', () => { resize(); initParticles(); });
+resize(); initParticles(); animate();
+
+// ---- Navbar scroll effect ----
+const nav = document.querySelector('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// ---- Mobile toggle ----
+const toggle = document.getElementById('mobileToggle');
+const navLinks = document.getElementById('navLinks');
+toggle.addEventListener('click', () => {
+  navLinks.classList.toggle('open');
+});
+
+// ---- Floating card parallax ----
+document.querySelectorAll('.floating-card').forEach((card, i) => {
+  document.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 2;
+    const y = (e.clientY / window.innerHeight - 0.5) * 2;
+    const rotY = x * 4 + (i === 0 ? -6 : i === 1 ? 4 : -2);
+    const rotX = y * 3 + (i === 0 ? 4 : i === 1 ? -2 : 6);
+    card.style.transform = `rotateY(${rotY}deg) rotateX(${rotX}deg)`;
+  });
+});
+
+// ---- Smooth section scroll for nav links ----
+document.querySelectorAll('.nav-links a[href^="#"]').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    navLinks.classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>
