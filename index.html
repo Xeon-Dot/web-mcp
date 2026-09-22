@@ -259,6 +259,7 @@ button { font-family: inherit; cursor: pointer; }
   border-top: 1px solid var(--color-border-weak);
   font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-text-weak);
 }
+section[id], header[id] { scroll-margin-top: 96px; }
 </style>
 </head>
 <body>
@@ -387,7 +388,76 @@ button { font-family: inherit; cursor: pointer; }
 </footer>
 
 <script>
-/* Task 5: 인터랙션 */
+// URL 복사
+function fallbackCopy(text) {
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  let ok = false;
+  try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+  document.body.removeChild(ta);
+  return ok;
+}
+
+async function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (e) { /* fall through */ }
+  }
+  return fallbackCopy(text);
+}
+
+document.querySelectorAll("[data-copy]").forEach((btn) => {
+  const original = btn.textContent;
+  btn.addEventListener("click", async () => {
+    const target = document.querySelector(btn.dataset.copy);
+    if (!target) return;
+    const ok = await copyText(target.textContent.trim());
+    if (ok) {
+      btn.textContent = "복사됨 ✓";
+      btn.setAttribute("data-copied", "");
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.removeAttribute("data-copied");
+      }, 2000);
+    } else {
+      // 클립보드 실패: 텍스트를 선택해 사용자가 수동 복사 가능
+      const range = document.createRange();
+      range.selectNodeContents(target);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      btn.textContent = "텍스트 선택됨";
+      setTimeout(() => { btn.textContent = original; }, 2000);
+    }
+  });
+});
+
+// Nav 스크롤 상태
+const nav = document.getElementById("nav");
+const onScroll = () => nav.classList.toggle("scrolled", window.scrollY > 8);
+window.addEventListener("scroll", onScroll, { passive: true });
+onScroll();
+
+// 모바일 메뉴
+const toggle = document.getElementById("nav-toggle");
+const links = document.getElementById("nav-links");
+toggle.addEventListener("click", () => {
+  const open = links.classList.toggle("open");
+  toggle.setAttribute("aria-expanded", String(open));
+  toggle.setAttribute("aria-label", open ? "메뉴 닫기" : "메뉴 열기");
+});
+links.addEventListener("click", (e) => {
+  if (e.target.closest("a")) {
+    links.classList.remove("open");
+    toggle.setAttribute("aria-expanded", "false");
+  }
+});
 </script>
 </body>
 </html>
