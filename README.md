@@ -1,8 +1,11 @@
 # web-mcp
 
-**Xeon MCP** — Model Context Protocol을 위한 고성능 게이트웨이.
+**Xeon MCP** — 여러 HTTP MCP를 무료로 사용하는 플랫폼.
 
-AI 에이전트에 컨텍스트, 도구, 데이터 소스를 연결하는 MCP(Model Context Protocol) 기반 서비스의 소개 페이지입니다.
+AI 에이전트와 MCP 클라이언트를 위한 무료 HTTP MCP 허브의 소개 페이지입니다.
+현재 SearXNG 웹 검색 서버를 제공하며, 추가 서버가 준비 중입니다.
+
+- SearXNG: https://mcp.xeon.kr/searxng
 
 ## 시작하기
 
@@ -19,8 +22,8 @@ python3 -m http.server 8080
 ## 기술 스택
 
 - 단일 HTML 파일 (Vanilla JS + CSS)
-- Canvas 기반 입자 배경 애니메이션
-- 마우스 반응형 3D 카드 인터랙션
+- IBM Plex Sans / IBM Plex Mono
+- `prefers-color-scheme` 기반 라이트/다크 자동 전환
 - 완전 반응형 (데스크톱 · 태블릿 · 모바일)
 
 ---
