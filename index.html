@@ -7,11 +7,19 @@
   <meta name="description" content="Xeon MCP는 여러 HTTP MCP 서버를 무료로 사용할 수 있는 플랫폼입니다. 설치 없이 URL만으로 AI 클라이언트에 연결하세요." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="icon" href="data:," />
+  <link rel="icon" href="https://cdn.xeon.kr/Xeon-favicon.svg" type="image/svg+xml" />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    // 저장된 테마 선호를 렌더 전에 적용 (FOUC 방지)
+    try {
+      const t = localStorage.getItem("theme");
+      if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
+  </script>
 <style>
 /* ===== Design Tokens ===== */
 :root {
+  color-scheme: light dark;
   --font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
   --color-background: hsl(0, 20%, 99%);
@@ -32,7 +40,7 @@
   --pad-x: 1.5rem;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --color-background: hsl(0, 9%, 7%);
     --color-background-weak: hsl(0, 6%, 10%);
     --color-background-weak-hover: hsl(0, 6%, 15%);
@@ -48,6 +56,34 @@
     --color-on-accent: hsl(0, 5%, 12%);
   }
 }
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-background: hsl(0, 9%, 7%);
+  --color-background-weak: hsl(0, 6%, 10%);
+  --color-background-weak-hover: hsl(0, 6%, 15%);
+  --color-background-strong: hsl(0, 15%, 94%);
+  --color-background-strong-hover: hsl(0, 15%, 97%);
+  --color-text: hsl(0, 4%, 71%);
+  --color-text-weak: hsl(0, 2%, 49%);
+  --color-text-strong: hsl(0, 15%, 94%);
+  --color-text-inverted: hsl(0, 9%, 7%);
+  --color-border: hsl(0, 3%, 28%);
+  --color-border-weak: hsl(0, 4%, 23%);
+  --color-icon: hsl(10, 3%, 43%);
+  --color-on-accent: hsl(0, 5%, 12%);
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+/* ===== Theme-dependent logo (white text = dark bg, black text = light bg) ===== */
+.logo .logo-dark-text { display: none; } /* white-text hidden by default */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .logo .logo-light-text { display: none; }
+  :root:not([data-theme="light"]) .logo .logo-dark-text { display: block; }
+}
+:root[data-theme="dark"] .logo .logo-light-text { display: none; }
+:root[data-theme="dark"] .logo .logo-dark-text { display: block; }
 
 /* ===== Reset & Base ===== */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -79,14 +115,9 @@ button { font-family: inherit; cursor: pointer; }
   display: flex; align-items: center; gap: 10px;
   font-weight: 700; font-size: 1.1rem; color: var(--color-text-strong);
 }
-.logo-mark {
-  width: 28px; height: 28px; border-radius: 6px;
-  background: var(--color-background-strong);
-  color: var(--color-text-inverted);
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-mono); font-weight: 600; font-size: 0.9rem;
-}
+.logo img { height: 32px; width: auto; display: block; }
 .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+.nav-actions { display: flex; align-items: center; gap: 4px; }
 .nav-links a { font-size: 0.9rem; color: var(--color-text-weak); }
 .nav-links a:hover { color: var(--color-text-strong); text-decoration: underline; text-underline-offset: 4px; }
 .btn {
@@ -108,6 +139,20 @@ button { font-family: inherit; cursor: pointer; }
   width: 40px; height: 40px; color: var(--color-icon);
 }
 .nav-toggle svg { width: 22px; height: 22px; }
+.theme-toggle {
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: none;
+  width: 40px; height: 40px; color: var(--color-icon);
+}
+.theme-toggle:hover { color: var(--color-text-strong); }
+.theme-toggle svg { width: 20px; height: 20px; }
+.theme-toggle .icon-sun { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-toggle .icon-moon { display: none; }
+  :root:not([data-theme="light"]) .theme-toggle .icon-sun { display: block; }
+}
+:root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+:root[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
 
 /* ===== Hero ===== */
 .hero { padding: calc(var(--space-section) * 1.5) 0 var(--space-section); }
@@ -266,9 +311,26 @@ section[id], header[id] { scroll-margin-top: 96px; }
 <nav class="nav" id="nav">
   <div class="container nav-inner">
     <a class="logo" href="#">
-      <span class="logo-mark">X</span>
-      Xeon MCP
+      <img class="logo-light-text" src="https://cdn.xeon.kr/Xeon-logo-blacktext-tran.svg" alt="Xeon MCP" />
+      <img class="logo-dark-text" src="https://cdn.xeon.kr/Xeon-logo-whitetext-tran.svg" alt="Xeon MCP" />
     </a>
+    <div class="nav-actions">
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="테마 전환">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      </button>
     <button class="nav-toggle" id="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" aria-controls="nav-links">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <line x1="4" y1="7" x2="20" y2="7"></line>
@@ -276,6 +338,7 @@ section[id], header[id] { scroll-margin-top: 96px; }
         <line x1="4" y1="17" x2="20" y2="17"></line>
       </svg>
     </button>
+    </div>
     <ul class="nav-links" id="nav-links">
       <li><a href="#features">특징</a></li>
       <li><a href="#servers">서버</a></li>
@@ -369,8 +432,8 @@ section[id], header[id] { scroll-margin-top: 96px; }
     <div class="footer-inner">
       <div>
         <a class="logo" href="#">
-          <span class="logo-mark">X</span>
-          Xeon MCP
+          <img class="logo-light-text" src="https://cdn.xeon.kr/Xeon-logo-blacktext-tran.svg" alt="Xeon MCP" />
+          <img class="logo-dark-text" src="https://cdn.xeon.kr/Xeon-logo-whitetext-tran.svg" alt="Xeon MCP" />
         </a>
         <p class="footer-desc">여러 HTTP MCP를 무료로 사용하는 플랫폼.</p>
       </div>
@@ -435,6 +498,19 @@ document.querySelectorAll("[data-copy]").forEach((btn) => {
       setTimeout(() => { btn.textContent = original; }, 2000);
     }
   });
+});
+
+// 테마 토글 (라이트/다크 수동 전환, 선호 기억)
+const themeToggle = document.getElementById("theme-toggle");
+function currentTheme() {
+  const attr = document.documentElement.getAttribute("data-theme");
+  if (attr) return attr;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+themeToggle.addEventListener("click", () => {
+  const next = currentTheme() === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("theme", next); } catch (e) {}
 });
 
 // Nav 스크롤 상태
