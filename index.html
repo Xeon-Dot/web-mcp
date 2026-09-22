@@ -230,7 +230,7 @@ button { font-family: inherit; cursor: pointer; }
   background: var(--color-accent); border-color: transparent;
   color: var(--color-on-accent);
 }
-.server-desc { font-size: 0.875rem; color: var(--color-text-weak); line-height: 170%; }
+.server-desc { font-size: 0.875rem; color: var(--color-text-weak); line-height: 180%; }
 .server-url {
   font-family: var(--font-mono); font-size: 0.8rem;
   color: var(--color-text); margin-top: 4px;
@@ -382,7 +382,7 @@ section[id], header[id] { scroll-margin-top: 96px; }
       </ul>
     </div>
     <div class="footer-legal">
-      Built on the Model Context Protocol by Anthropic.
+      Apache License 2.0 · Built on the Model Context Protocol by Anthropic.
     </div>
   </div>
 </footer>
@@ -432,7 +432,7 @@ document.querySelectorAll("[data-copy]").forEach((btn) => {
       const sel = window.getSelection();
       sel.removeAllRanges();
       sel.addRange(range);
-      btn.textContent = "텍스트 선택됨";
+      btn.textContent = "Ctrl+C로 복사";
       setTimeout(() => { btn.textContent = original; }, 2000);
     }
   });
