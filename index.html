@@ -7,6 +7,7 @@
   <meta name="description" content="Xeon MCP는 여러 HTTP MCP 서버를 무료로 사용할 수 있는 플랫폼입니다. 설치 없이 URL만으로 AI 클라이언트에 연결하세요." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="icon" href="data:," />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
 /* ===== Design Tokens ===== */
@@ -18,7 +19,6 @@
   --color-background-weak-hover: hsl(0, 8%, 94%);
   --color-background-strong: hsl(0, 5%, 12%);
   --color-background-strong-hover: hsl(0, 5%, 18%);
-  --color-background-interactive-weaker: hsl(64, 74%, 95%);
   --color-text: hsl(0, 1%, 39%);
   --color-text-weak: hsl(0, 1%, 60%);
   --color-text-strong: hsl(0, 5%, 12%);
@@ -38,7 +38,6 @@
     --color-background-weak-hover: hsl(0, 6%, 15%);
     --color-background-strong: hsl(0, 15%, 94%);
     --color-background-strong-hover: hsl(0, 15%, 97%);
-    --color-background-interactive-weaker: hsl(60, 20%, 8%);
     --color-text: hsl(0, 4%, 71%);
     --color-text-weak: hsl(0, 2%, 49%);
     --color-text-strong: hsl(0, 15%, 94%);
@@ -152,7 +151,7 @@ button { font-family: inherit; cursor: pointer; }
   transition: background 0.15s;
 }
 .url-copy:hover { background: var(--color-background-weak-hover); color: var(--color-text-strong); }
-.url-copy[data-copied] { color: var(--color-text-strong); background: var(--color-accent); }
+.url-copy[data-copied] { color: var(--color-on-accent); background: var(--color-accent); }
 
 /* ===== Features ===== */
 .section { padding: var(--space-section) 0; border-top: 1px solid var(--color-border-weak); }
@@ -454,6 +453,13 @@ toggle.addEventListener("click", () => {
 });
 links.addEventListener("click", (e) => {
   if (e.target.closest("a")) {
+    links.classList.remove("open");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-label", "메뉴 열기");
+  }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && links.classList.contains("open")) {
     links.classList.remove("open");
     toggle.setAttribute("aria-expanded", "false");
     toggle.setAttribute("aria-label", "메뉴 열기");
