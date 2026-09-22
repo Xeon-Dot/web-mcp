@@ -27,6 +27,7 @@
   --color-border-weak: hsla(0, 100%, 3%, 0.12);
   --color-icon: hsl(0, 1%, 55%);
   --color-accent: hsl(62, 84%, 88%);
+  --color-on-accent: hsl(0, 5%, 12%);
   --space-section: 4rem;
   --pad-x: 1.5rem;
 }
@@ -45,6 +46,7 @@
     --color-border: hsl(0, 3%, 28%);
     --color-border-weak: hsl(0, 4%, 23%);
     --color-icon: hsl(10, 3%, 43%);
+    --color-on-accent: hsl(0, 5%, 12%);
   }
 }
 
@@ -226,7 +228,7 @@ button { font-family: inherit; cursor: pointer; }
 }
 .badge-live {
   background: var(--color-accent); border-color: transparent;
-  color: hsl(0, 5%, 12%);
+  color: var(--color-on-accent);
 }
 .server-desc { font-size: 0.875rem; color: var(--color-text-weak); line-height: 170%; }
 .server-url {
