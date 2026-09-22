@@ -152,6 +152,36 @@ button { font-family: inherit; cursor: pointer; }
 .url-copy:hover { background: var(--color-background-weak-hover); color: var(--color-text-strong); }
 .url-copy[data-copied] { color: var(--color-text-strong); background: var(--color-accent); }
 
+/* ===== Features ===== */
+.section { padding: var(--space-section) 0; border-top: 1px solid var(--color-border-weak); }
+.section-label {
+  font-family: var(--font-mono); font-size: 0.8rem; font-weight: 500;
+  color: var(--color-text-weak); letter-spacing: 0.05em;
+  margin-bottom: 16px;
+}
+.section h2 {
+  font-size: clamp(1.4rem, 3vw, 1.75rem); font-weight: 700;
+  color: var(--color-text-strong); line-height: 1.4;
+  max-width: 24ch;
+}
+.features-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1px; margin-top: 40px;
+  background: var(--color-border-weak);
+  border: 1px solid var(--color-border-weak);
+  border-radius: 6px; overflow: hidden;
+}
+.feature-card { background: var(--color-background); padding: 24px; }
+.feature-card .icon {
+  font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600;
+  color: var(--color-text-weak); margin-bottom: 14px;
+}
+.feature-card h3 {
+  font-size: 1rem; font-weight: 600;
+  color: var(--color-text-strong); margin-bottom: 8px;
+}
+.feature-card p { font-size: 0.9rem; line-height: 180%; color: var(--color-text); }
+
 @media (max-width: 48rem) {
   .nav-links {
     display: none;
@@ -211,7 +241,35 @@ button { font-family: inherit; cursor: pointer; }
   </div>
 </header>
 
-<!-- Task 3: 특징 섹션 -->
+<section class="section features" id="features">
+  <div class="container">
+    <div class="section-label">// features</div>
+    <h2>바로 쓸 수 있는 무료 MCP 허브</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="icon">01</div>
+        <h3>완전 무료</h3>
+        <p>모든 HTTP MCP 서버를 비용 없이 사용할 수 있습니다. 요금제나 가입 절차 없이 바로 연결하세요.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">02</div>
+        <h3>설치 없이 URL만</h3>
+        <p>HTTP 방식이라 별도 런타임이나 빌드가 필요하지 않습니다. URL을 복사해 클라이언트에 붙여넣으면 끝입니다.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">03</div>
+        <h3>어느 클라이언트와든</h3>
+        <p>Claude Desktop, Cursor, OpenCode 등 표준 MCP를 지원하는 모든 클라이언트에서 동일하게 동작합니다.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">04</div>
+        <h3>계속 늘어나는 서버</h3>
+        <p>새로운 MCP 서버가 지속적으로 추가됩니다. 지금은 SearXNG 웹 검색을 시작으로 준비 중인 서버가 많습니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Task 4: 서버 목록 섹션 + Footer -->
 
 <script>
